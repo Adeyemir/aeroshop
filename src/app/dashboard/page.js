@@ -218,9 +218,8 @@ export default function DashboardPage() {
               <option value="Base_Sepolia">Base</option>
               <option value="Ethereum_Sepolia">Ethereum</option>
               <option value="Arbitrum_Sepolia">Arbitrum</option>
-              <option value="Polygon_Amoy">Polygon</option>
               <option value="Avalanche_Fuji">Avalanche</option>
-              <option value="Optimism_Sepolia">Optimism</option>
+              <option value="OP_Sepolia">Optimism</option>
               <option value="Unichain_Sepolia">Unichain</option>
             </select>
           </div>

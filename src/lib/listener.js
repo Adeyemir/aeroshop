@@ -41,12 +41,13 @@ const CHAIN_CONFIG = {
     usdcAddress: process.env.USDC_ARB_SEPOLIA || '0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d',
     explorerTx: 'https://sepolia.arbiscan.io/tx/',
   },
-  'Polygon_Amoy': {
-    displayName: 'Polygon Amoy',
-    rpcUrl: process.env.RPC_POLYGON_AMOY || 'https://rpc-amoy.polygon.technology',
-    usdcAddress: process.env.USDC_POLYGON_AMOY || '0x41E94Eb019C0762f9Bfcf9Fb1E58725BfB0e7582',
-    explorerTx: 'https://amoy.polygonscan.com/tx/',
-  },
+  // Polygon Amoy disabled — RPC is down (ENOTFOUND)
+  // 'Polygon_Amoy': {
+  //   displayName: 'Polygon Amoy',
+  //   rpcUrl: process.env.RPC_POLYGON_AMOY || 'https://rpc-amoy.polygon.technology',
+  //   usdcAddress: process.env.USDC_POLYGON_AMOY || '0x41E94Eb019C0762f9Bfcf9Fb1E58725BfB0e7582',
+  //   explorerTx: 'https://amoy.polygonscan.com/tx/',
+  // },
   'Avalanche_Fuji': {
     displayName: 'Avalanche Fuji',
     rpcUrl: process.env.RPC_AVAX_FUJI || 'https://api.avax-test.network/ext/bc/C/rpc',

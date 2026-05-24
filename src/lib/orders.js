@@ -1,6 +1,9 @@
 /**
  * Order Store (Persistent)
- * Saves orders to a local JSON file to survive server restarts.
+ * 
+ * Reads from disk on EVERY access to ensure all API routes
+ * see the latest state (critical in Next.js dev mode where
+ * different routes may run in separate module instances).
  */
 
 import fs from 'fs';
@@ -8,35 +11,32 @@ import path from 'path';
 
 const DB_PATH = path.join(process.cwd(), 'orders.json');
 
-// Initialize store from file or empty map
-let orders = new Map();
-
-function loadFromDisk() {
+/**
+ * Read all orders from disk. Called on every access.
+ */
+function readOrders() {
   try {
     if (fs.existsSync(DB_PATH)) {
-      const data = JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
-      orders = new Map(Object.entries(data));
-      console.log(`[DB] Loaded ${orders.size} orders from disk.`);
+      return JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
     }
   } catch (err) {
-    console.error('[DB] Failed to load orders:', err.message);
+    console.error('[DB] Failed to read orders:', err.message);
   }
+  return {};
 }
 
-function saveToDisk() {
+/**
+ * Write all orders to disk.
+ */
+function writeOrders(data) {
   try {
-    const data = Object.fromEntries(orders);
     fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
   } catch (err) {
     console.error('[DB] Failed to save orders:', err.message);
   }
 }
 
-// Initial load
-loadFromDisk();
-
 export function createOrder(input) {
-  // Accept either a number (amount) or an object with fields
   const data = typeof input === 'number' ? { amount: input } : input;
   const id = data.id || `order_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
   
@@ -64,28 +64,30 @@ export function createOrder(input) {
     paidChain: null
   };
   
-  orders.set(id, order);
-  saveToDisk();
+  const orders = readOrders();
+  orders[id] = order;
+  writeOrders(orders);
   return order;
 }
 
 export function getOrder(id) {
-  return orders.get(id);
+  const orders = readOrders();
+  return orders[id] || null;
 }
 
 export function updateOrder(id, updates) {
-  const order = orders.get(id);
-  if (order) {
-    const updated = { ...order, ...updates };
-    orders.set(id, updated);
-    saveToDisk();
-    return updated;
+  const orders = readOrders();
+  if (orders[id]) {
+    orders[id] = { ...orders[id], ...updates };
+    writeOrders(orders);
+    return orders[id];
   }
   return null;
 }
 
 export function getAllOrders() {
-  return Array.from(orders.values()).sort((a, b) => 
+  const orders = readOrders();
+  return Object.values(orders).sort((a, b) => 
     new Date(b.createdAt) - new Date(a.createdAt)
   );
 }
